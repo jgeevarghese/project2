@@ -22,14 +22,15 @@ export class mediaImage extends DDD {
 
   static get styles() {
     return css`
-    .image{
+    img{
       border: solid 2px black ;
       border-radius: 8px;
       cursor: pointer;
       transition: all ease-in .3s;
       display: inherit;
-      margin: 32px 0;
       transition: all .3s ease-in;
+      height: 200px;
+      width: auto;
     }
     img:hover {
       transform: translate(8px,-8px);
