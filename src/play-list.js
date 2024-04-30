@@ -54,21 +54,15 @@ firstUpdated(){
   const mediaImage = document.querySelectorAll("media-image");
   const selectedImage = "";
 
-  //Find all the media images on the page
-  //Somehow pull all their data into an array
+  
   mediaImage.forEach(img => {
-    // push each image into slideArray
     this.slideArray.push(img.getAttribute("imageSrc"));
     this.requestUpdate();
   })
   console.log(this.slideArray);
 
-  // this is gonna listen for the event to be triggered 
-  //and send down the dom tree to open play list tag
+
   document.addEventListener("media-clicked", (e) =>{
-    //Show your play-list
-    //Figure out which image was clicked
-    //Show that images content first 
     var clickedURL = e.target.attributes[0].nodeValue;
     var index = this.slideArray.indexOf(clickedURL);
 
@@ -76,7 +70,6 @@ firstUpdated(){
       this.currentSlideIndex = index;
     }
     
-    //SHOW play list
     this.visible = true;
   });
 }
