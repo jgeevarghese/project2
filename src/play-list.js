@@ -1,7 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { DDD } from "@lrnwebcomponents/d-d-d/d-d-d.js";
 
-export class PlayList extends DDD {
+export class playList extends DDD {
 
   static get tag() {
     return 'play-list';
@@ -11,68 +11,127 @@ export class PlayList extends DDD {
     super();
     this.currentSlideIndex = 0;
     this.slideArray = [];
-    this.showSlideshow = false;
-    this.slideshowImages = [];
+    this.visible = false;
   }
 
   static get styles() {
     return css`
-     
+      .playList{
+        height: 100%;
+        width: auto;
+
+        display: flex;
+        flex-direction: column;
+        background-color: color-mix(in srgb, black 50%, #00000000); 
+
+
+        z-index: 100000;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+      }
+
+      .blah{
+        height: 80%;
+        width: 80%;
+
+        padding-top: 32px;
+      }
+
+      .flex-row{
+        flex-direction: row;
+      }
+
+      
+
     `;
   }
 
-  firstUpdated() {
-    const mediaImages = this.shadowRoot.querySelectorAll("media-image");
-    mediaImages.forEach(img => {
-      this.slideArray.push(img.getAttribute("imageSrc"));
-    });
-  }
 
-  handleImageClick(imageSrc) {
-    this.slideshowImages = [...this.slideArray];
-    this.currentSlideIndex = this.slideshowImages.indexOf(imageSrc);
-    this.showSlideshow = true;
-  }
+firstUpdated(){
+  const mediaImage = document.querySelectorAll("media-image");
+  const selectedImage = "";
 
-  closeSlideshow() {
-    this.showSlideshow = false;
-    this.slideshowImages = [];
-  }
+  //Find all the media images on the page
+  //Somehow pull all their data into an array
+  mediaImage.forEach(img => {
+    // push each image into slideArray
+    this.slideArray.push(img.getAttribute("imageSrc"));
+    this.requestUpdate();
+  })
+  console.log(this.slideArray);
+
+  // this is gonna listen for the event to be triggered 
+  //and send down the dom tree to open play list tag
+  document.addEventListener("media-clicked", (e) =>{
+    //Show your play-list
+    //Figure out which image was clicked
+    //Show that images content first 
+    var clickedURL = e.target.attributes[0].nodeValue;
+    var index = this.slideArray.indexOf(clickedURL);
+
+    if(index != -1){
+      this.currentSlideIndex = index;
+    }
+    
+    //SHOW play list
+    this.visible = true;
+  });
+}
 
   previousSlide() {
-    this.currentSlideIndex = (this.currentSlideIndex - 1 + this.slideshowImages.length) % this.slideshowImages.length;
+    this.currentSlideIndex -= 1;
+
+    if(this.currentSlideIndex == -1){
+      this.currentSlideIndex = this.slideArray.length - 1;
+    }
+
   }
 
   nextSlide() {
-    this.currentSlideIndex = (this.currentSlideIndex + 1) % this.slideshowImages.length;
+    this.currentSlideIndex += 1;
+
+    if(this.currentSlideIndex == this.slideArray.length){
+      this.currentSlideIndex = 0;
+    }
+  }
+
+  showSlide(index) {
+    this.slides.forEach((slide, i) => {
+      slide.style.display = i === index ? 'block' : 'none';
+    });
+  }
+
+  closeWindow(){
+    this.visible = false;
   }
 
   render() {
+    if(!this.visible) return html``;
+
     return html`
-      <dialog class="playList" ?open="${this.showSlideshow}" @click="${this.closeSlideshow}">
-        <button class="exitButton">x</button>
-        <div>
-          <button @click="${this.previousSlide}"> < </button>
-          <img class="preview" src="${this.slideshowImages[this.currentSlideIndex]}" alt="Slide" height="300px" width="300px">
-          <button @click="${this.nextSlide}"> > </button>
+    <div class="background">
+      <dialog class="playList">
+        <button class="exitButton" @click="${this.closeWindow}">x</button>
+        <div class='flex-row'>
+          <button @click="${this.previousSlide}"> Previous </button>
+          <img class="blah" src="${this.slideArray[this.currentSlideIndex]}" alt="Italian Trulli">
+          <button @click="${this.nextSlide}"> Next </button>
         </div>
       </dialog>
-      <div>
-        ${this.slideArray.map(imageSrc => html`
-          <img class="previewImage" src="${imageSrc}" alt="Preview Image" @click="${() => this.handleImageClick(imageSrc)}">
-        `)}
       </div>
       `;
   }
 
   static get properties() {
     return {
-      currentSlideIndex: { type: Number },
-      slideArray: { type: Array },
-      showSlideshow: { type: Boolean },
-      slideshowImages: { type: Array }
+      currentSlideIndex: {type: Number},
+      slideArray: {type: Array}, 
+      visible: {type: Boolean, Reflect: true}, 
     };
   }
 }
 
-customElements.define(PlayList.tag, PlayList);
+globalThis.customElements.define(playList.tag, playList);
